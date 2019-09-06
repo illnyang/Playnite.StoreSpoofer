@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
 using Playnite.SDK;
 using Playnite.SDK.Plugins;
 using StoreSpoofer.Extensions;
@@ -145,6 +147,99 @@ namespace StoreSpoofer
                         {
                             game.PluginId = _gameGuidToOldLibraryGuid[game.Id];
                         }
+                    }
+                }),
+                new ExtensionFunction("Auto-match GameId and Library Plugin for the Selected Game(s)", () =>
+                {
+                    if (!_api.MainView.SelectedGames.Any())
+                    {
+                        _api.Dialogs.ShowErrorMessage("Please select at least one Game.", "No Games selected.");
+                        return;
+                    }
+
+                    uint count = 0;
+                    foreach (var game in _api.MainView.SelectedGames)
+                    {
+                        var matches = Task.Run(async () => await AutoMatch.FindMatches(game)).Result;
+
+                        if (matches.Count == 1)
+                        {
+                            game.GameId = matches[0].GameId;
+                            game.PluginId = matches[0].Plugin.ToGuid();
+                            
+                            if (!_gameGuidToOldLibraryGuid.ContainsKey(game.Id))
+                            {
+                                _gameGuidToOldLibraryGuid[game.Id] = game.PluginId;
+                            }
+                            
+                            if (!_gameGuidToOldGameId.ContainsKey(game.Id))
+                            {
+                                _gameGuidToOldGameId[game.Id] = game.GameId;
+                            }
+                            
+                            count++;
+                        }
+                        else if (matches.Count > 1)
+                        {
+                            var messageBoxTextBuilder = new StringBuilder();
+                            messageBoxTextBuilder.Append("Choose library for this game:");
+                            messageBoxTextBuilder.Append(string.Join(", ", matches.Select(x => x.Plugin.EnumGetDescription()).ToArray()));
+                            messageBoxTextBuilder.Append(".");
+                            
+                            showDialog2:
+                            var enterGameIdDialogResult = _api.Dialogs.SelectString(messageBoxTextBuilder.ToString(),
+                                game.Name, matches[0].Plugin.EnumGetDescription());
+
+                            if (!enterGameIdDialogResult.Result)
+                            {
+                                continue;
+                            }
+                            
+                            GameLibrary userResult;
+                            
+                            var selectedString = enterGameIdDialogResult.SelectedString;
+
+                            if (!selectedString.EnumFromDescription(out userResult) && !Enum.TryParse(selectedString, true, out userResult))
+                            {
+                                _api.Dialogs.ShowErrorMessage(
+                                    "Given Library Plugin does not exist. Please enter a correct name or cancel.",
+                                    "Failed to find corresponding Guid.");
+                                goto showDialog2;
+                            }
+
+                            if (matches.All(x => x.Plugin != userResult))
+                            {
+                                _api.Dialogs.ShowErrorMessage(
+                                    "Given Library Plugin was not matched. Please enter a correct name or cancel.",
+                                    "Non-matching input.");
+                                goto showDialog2;
+                            }
+
+                            var selectedMatch = matches.Single(x => x.Plugin == userResult);
+
+                            if (!_gameGuidToOldLibraryGuid.ContainsKey(game.Id))
+                            {
+                                _gameGuidToOldLibraryGuid[game.Id] = game.PluginId;
+                            }
+                            
+                            if (!_gameGuidToOldGameId.ContainsKey(game.Id))
+                            {
+                                _gameGuidToOldGameId[game.Id] = game.GameId;
+                            }
+
+                            game.GameId = selectedMatch.GameId;
+                            game.PluginId = selectedMatch.Plugin.ToGuid();
+                            count++;
+                        }
+                        else
+                        {
+                            _api.Dialogs.ShowErrorMessage($"Auto matching failed for \'{game.Name}\'.", "No matches.");
+                        }
+                    }
+                    
+                    if (count > 0)
+                    {
+                        _api.Dialogs.ShowMessage($"Successfully matched {count} game(s)!", "Success!", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 })
             };

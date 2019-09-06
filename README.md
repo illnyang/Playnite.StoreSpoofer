@@ -1,3 +1,4 @@
+
 # Playnite.StoreSpoofer
 
 This plugin allows for per-entry editing of `GameId` and `PluginId` properties of your games.
@@ -14,14 +15,16 @@ Go to `%localappdata%\Playnite\Extensions` (or wherever you've installed your Pl
 
 # Usage
 
-After you've installed the plugin, its functions will be listed in the `Playnite->Extensions` menu.
-Here's a step-by-step guide on how to download metadata from a given store.
+After you've installed the plugin, its functions will be listed in the `Playnite->Extensions` menu.  
+
+Automatic mode for games from Steam and GOG (possibly Origin in the future) is now available under `Auto-match...` method. It will **automatically set** `GameId` and `PluginId` properties and ask you which library you prefer when multiple providers are available.
+
+Here's a step-by-step guide on how to download metadata from a given store, manually:
 
  0. Find proper GameId for your Game with correspondence to the store you plan to use. Consult `Finding GameId` subsection for more insight.
  1. Use `Change Game Id of the Selected Game` and enter the new GameId.
  2. Use `Change Library Plugin of the Selected Game(s)` and enter the name of the new Store.
  3. Download metadata using Playnite's built-in editor - `Official Store` option should now be available.
- 4. Use `Restore Library Plugin of the Selected Game(s)` and `enter code here`
 
 Please note that some functions support multi-select editing, make use of that as you will.
 
