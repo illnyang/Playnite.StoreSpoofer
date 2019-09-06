@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using BattleNetLibrary;
+using BattleNetLibrary.Models;
 using Newtonsoft.Json;
 using Playnite.SDK.Models;
 
@@ -31,6 +33,12 @@ namespace StoreSpoofer
                 result.Add(findResult.Value);
 
             findResult = await TryFindGog(game);
+            
+            if (findResult.HasValue)
+                result.Add(findResult.Value);
+            
+            findResult = await TryFindBattleNet(game);
+            
             if (findResult.HasValue)
                 result.Add(findResult.Value);
 
@@ -188,6 +196,7 @@ namespace StoreSpoofer
                     var columnEnd = curLine.IndexOf(" | ", StringComparison.InvariantCultureIgnoreCase);
                     var gameName = curLine.Substring(2, columnEnd - 2).TrimEnd();
 
+                    // TODO: fuzzy matching?
                     if (SanitizedCompare(gameName, game.Name))
                     {
                         return new MatchResult
@@ -196,6 +205,23 @@ namespace StoreSpoofer
                             Plugin = GameLibrary.Gog
                         };
                     }
+                }
+            }
+
+            return null;
+        }
+
+        private static async Task<MatchResult?> TryFindBattleNet(Game game)
+        {
+            foreach (var bnetGame in BattleNetGames.Games)
+            {
+                if (SanitizedCompare(bnetGame.Name, game.Name))
+                {
+                    return new MatchResult
+                    {
+                        GameId = bnetGame.ProductId,
+                        Plugin = GameLibrary.BattleNet
+                    };
                 }
             }
 
