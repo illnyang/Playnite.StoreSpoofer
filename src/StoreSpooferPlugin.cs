@@ -233,13 +233,13 @@ namespace StoreSpoofer
                         }
                         else
                         {
-                            _api.Dialogs.ShowErrorMessage($"Auto matching failed for \'{game.Name}\'.", "No matches.");
+                            _api.Notifications.Add("StoreSpooferAutoFailed", $"Auto matching failed for \'{game.Name}\'.", NotificationType.Error);
                         }
                     }
                     
                     if (count > 0)
                     {
-                        _api.Dialogs.ShowMessage($"Successfully matched {count} game(s)!", "Success!", MessageBoxButton.OK, MessageBoxImage.Information);
+                        _api.Notifications.Add("StoreSpooferAutoSuccess", $"Successfully matched {count} game(s)!", NotificationType.Info);
                     }
                 })
             };
