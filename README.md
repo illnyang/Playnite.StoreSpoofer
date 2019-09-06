@@ -17,7 +17,7 @@ Go to `%localappdata%\Playnite\Extensions` (or wherever you've installed your Pl
 
 After you've installed the plugin, its functions will be listed in the `Playnite->Extensions` menu.  
 
-Automatic mode for games from Steam and GOG (possibly Origin in the future) is now available under `Auto-match...` method. It will **automatically set** `GameId` and `PluginId` properties and ask you which library you prefer when multiple providers are available.
+Automatic mode for games from Battle.Net, Steam and GOG is now available under `Auto-match...` method. It will **automatically set** `GameId` and `PluginId` properties and ask you which library you prefer when multiple providers are available.
 
 Here's a step-by-step guide on how to download metadata from a given store, manually:
 
