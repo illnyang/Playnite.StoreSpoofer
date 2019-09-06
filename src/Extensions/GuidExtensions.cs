@@ -3,7 +3,7 @@ using System.Text;
 
 namespace StoreSpoofer.Extensions
 {
-    public static class GuidExtensions
+    internal static class GuidExtensions
     {
         public static Guid ToGuid(this string src)
         {
@@ -11,6 +11,11 @@ namespace StoreSpoofer.Extensions
             var hashedBytes = new System.Security.Cryptography.SHA1CryptoServiceProvider().ComputeHash(stringBytes);
             Array.Resize(ref hashedBytes, 16);
             return new Guid(hashedBytes);
+        }
+
+        public static Guid ToGuid(this GameLibrary library)
+        {
+            return AvailablePlugins.LibraryToGuid[library];
         }
     }
 }

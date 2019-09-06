@@ -13,20 +13,6 @@ namespace StoreSpoofer
         private ILogger _logger;
         private readonly IPlayniteAPI _api;
 
-        private readonly Dictionary<string, Guid> _libraryNameToGuid = new Dictionary<string, Guid>
-        {
-            ["None (Playnite)"] = Guid.Empty,
-            ["BattleNet"] = Guid.Parse("E3C26A3D-D695-4CB7-A769-5FF7612C7EDD"),
-            ["Bethesda"] = Guid.Parse("0E2E793E-E0DD-4447-835C-C44A1FD506EC"),
-            ["Epic"] = Guid.Parse("00000002-DBD1-46C6-B5D0-B1BA559D10E4"),
-            ["Gog"] = Guid.Parse("AEBE8B7C-6DC3-4A66-AF31-E7375C6B5E9E"),
-            ["Itchio"] = Guid.Parse("00000001-EBB2-4EEC-ABCB-7C89937A42BB"),
-            ["Origin"] = Guid.Parse("85DD7072-2F20-4E76-A007-41035E390724"),
-            ["Steam"] = Guid.Parse("CB91DFC9-B977-43BF-8E70-55F46E410FAB"),
-            ["Twitch"] = Guid.Parse("E2A7D494-C138-489D-BB3F-1D786BEEB675"),
-            ["Uplay"] = Guid.Parse("C2F038E5-8B92-4877-91F1-DA9094155FC5")
-        };
-
         private readonly Dictionary<Guid, Guid> _gameGuidToOldLibraryGuid = new Dictionary<Guid, Guid>();
         private readonly Dictionary<Guid, string> _gameGuidToOldGameId = new Dictionary<Guid, string>();
 
@@ -107,7 +93,7 @@ namespace StoreSpoofer
 
                     var messageBoxTextBuilder = new StringBuilder();
                     messageBoxTextBuilder.Append("Available plugins: ");
-                    messageBoxTextBuilder.Append(string.Join(", ", _libraryNameToGuid.Select(x => x.Key)));
+                    messageBoxTextBuilder.Append(string.Join(", ", AvailablePlugins.LibraryToGuid.Select(x => x.Key.EnumGetDescription())));
                     messageBoxTextBuilder.Append(".");
 
                     showDialog:
@@ -119,7 +105,15 @@ namespace StoreSpoofer
                         return;
                     }
 
-                    if (!_libraryNameToGuid.ContainsKey(enterGameIdDialogResult.SelectedString))
+                    GameLibrary userResult;
+
+                    var selectedString = enterGameIdDialogResult.SelectedString;
+
+                    if (string.Equals(selectedString, "playnite", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        userResult = GameLibrary.None;
+                    }
+                    else if (!selectedString.EnumFromDescription(out userResult) && !Enum.TryParse(selectedString, true, out userResult))
                     {
                         _api.Dialogs.ShowErrorMessage(
                             "Given Library Plugin does not exist. Please enter a correct name or cancel.",
@@ -134,7 +128,7 @@ namespace StoreSpoofer
                             _gameGuidToOldLibraryGuid[game.Id] = game.PluginId;
                         }
 
-                        game.PluginId = _libraryNameToGuid[enterGameIdDialogResult.SelectedString];
+                        game.PluginId = userResult.ToGuid();
                     }
                 }),
                 new ExtensionFunction("Restore Library Plugin of the Selected Game(s)", () =>
