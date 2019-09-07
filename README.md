@@ -7,7 +7,7 @@ Here are some scenarios in which you'd want to edit  those properties:
  - Download metadata from an official store for a manually imported game.
  - Use metadata from a different store than the game was initially imported from.
 
-Includes an option to mass-undo all the changes you've made to your database with library.
+Includes an option to mass-undo all the changes you've made to your database with this plugin.
 
 # Installation
 
