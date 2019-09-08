@@ -78,7 +78,7 @@ Same as Bethesda; [Playnite checks if the game is installed](https://github.com/
 
 # Building
 
-Download or clone the project, restore the packages and build the project using preferred solution configuration. All necessary manifest files will be copied to the `/bin/${Configuration}/` folder alongside the binary.
+Download or clone the project, restore the packages and copy `BethesdaLibrary.dll` from your Playnite installation to the `external` folder. Then build the project using preferred solution configuration. All necessary manifest files will be copied to the `/bin/${Configuration}/` folder alongside the binary.
 
 # Future
 As of now (9/6/2019) [there is no way to introduce custom Metadata Providers](https://github.com/JosefNemec/Playnite/issues/417) . A more viable option than this workaround-tier plugin would be to implement a custom Metadata Provider that could search various game stores for a given title and download the data via HTML parsing. This could be implemented in four ways:
